@@ -1,0 +1,43 @@
+#app {
+  position: relative;
+}
+
+#modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+          align-items: center;
+}
+
+#modal .wrap {
+  padding: 10px;
+  position: relative;
+  background: #FFF;
+  width: 600px;
+  max-width: 90%;
+  height: 300px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #aaa;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+          align-items: center;
+}
+
+#modal .close {
+  position: absolute;
+  top: -0.5em;
+  right: 0;
+  font-size: 3em;
+}
+

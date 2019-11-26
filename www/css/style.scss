@@ -1,0 +1,34 @@
+#app {
+    position: relative;
+}
+
+#modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .wrap {
+        padding: 10px;
+        position: relative;
+        background: #FFF;
+        width: 600px;
+        max-width: 90%;
+        height: 300px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #aaa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .close {
+        position: absolute;
+        top: -0.5em;
+        right: 0;
+        font-size: 3em;
+    }
+}
