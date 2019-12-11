@@ -28,8 +28,7 @@
   box-shadow: 0 0 10px #aaa;
   display: -webkit-box;
   display: flex;
-  -webkit-box-pack: center;
-          justify-content: center;
+  flex-wrap: wrap;
   -webkit-box-align: center;
           align-items: center;
 }

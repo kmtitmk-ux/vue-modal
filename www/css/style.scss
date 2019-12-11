@@ -22,7 +22,7 @@
         border-radius: 8px;
         box-shadow: 0 0 10px #aaa;
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
         align-items: center;
     }
     .close {
