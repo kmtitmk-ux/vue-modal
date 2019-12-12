@@ -13218,38 +13218,59 @@ __webpack_require__(/*! bootstrap-css-only */ "./node_modules/bootstrap-css-only
 var Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 
 Vue.component('img-list', {
-  props: ['item'],
-  template: "\n        <img class=\"w-25 h-auto\" v-bind:src=\"'/images/' + item + '.jpg'\">\n    "
-});
-Vue.component('list', {
-  props: ['item'],
-  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <div class=\"card-img-overlay\">\n                <input type=\"checkbox\" v-bind:value=\"item\" @change=\"select\" v-model=\"checked\">\n            </div>\n        </div>\n    ",
-  data: function data(_data) {
-    if (app.select.includes(_data.item)) {
-      return {
-        checked: true
-      };
-    } else {
-      return {
-        checked: false
-      };
-    }
-  },
+  props: ['item', 'main_id'],
+  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input name=\"main\" type=\"radio\" v-bind:value=\"item\" @change=\"select_radio\" v-bind:checked=\"set_checked(item, main_id)\">\n                </div>\n            </label>\n        </div>\n    ",
   methods: {
-    select: function select(e) {
-      if (e.target.checked) {
-        app.select.push(parseInt(e.target.value));
+    select_radio: function select_radio(e) {
+      app.select_main_img = '<img class="d-block m-auto" src="/images/' + e.target.value + '.jpg">';
+      app.select_main_img_id = e.target.value;
+    },
+    set_checked: function set_checked(item, main_id) {
+      if (main_id == item) {
+        return true;
       } else {
-        var index = app.select.indexOf(parseInt(e.target.value));
-
-        if (index > -1) {
-          app.select.splice(index, 1);
-        }
+        return false;
       }
     }
   }
 });
-Vue.component('modal-item', {
+Vue.component('list', {
+  props: ['item'],
+  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"checkbox\" v-bind:value=\"item\" @change=\"select_checkbox\" v-model=\"checked\" v-bind:disabled=\"set_disabled(item)\">\n                </div>\n            </label>\n        </div>\n    ",
+  data: function data(_data) {
+    if (app.select_sub_img.includes(_data.item)) {
+      checked = true;
+    } else {
+      checked = false;
+    }
+
+    return {
+      checked: checked
+    };
+  },
+  methods: {
+    select_checkbox: function select_checkbox(e) {
+      if (e.target.checked) {
+        app.select_sub_img.push(parseInt(e.target.value));
+      } else {
+        var del = [];
+        var idx = app.select_sub_img.indexOf(parseInt(e.target.value));
+
+        if (idx >= 0) {
+          app.select_sub_img.splice(idx, 1);
+        }
+      }
+    },
+    set_disabled: function set_disabled(item) {
+      if (app.select_main_img_id == item) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+});
+Vue.component('modal-cont', {
   props: ['data'],
   template: "\n        <div id=\"modal\" @click=\"except_modal_close\">\n            <div class=\"wrap\">\n                <span class=\"close\" @click=\"modal_close\">&times;</span>\n                <list\u3000v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list>\n            </div>\n        </div>\n    ",
   methods: {
@@ -13267,8 +13288,13 @@ var app = new Vue({
   el: '#app',
   data: {
     show: false,
-    list: list_array,
-    select: select_array
+    img_list: image_array,
+    select_sub_img: select_sub_img,
+    select_main_img: null,
+    select_main_img_id: select_main_img_id
+  },
+  created: function created() {
+    this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg">';
   },
   methods: {
     click_show: function click_show() {

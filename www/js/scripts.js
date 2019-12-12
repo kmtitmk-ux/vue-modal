@@ -2,10 +2,30 @@ require('bootstrap-css-only')
 const Vue = require('vue')
 
 Vue.component('img-list', {
-    props: ['item'],
+    props: ['item', 'main_id'],
     template: `
-        <img class="w-25 h-auto" v-bind:src="'/images/' + item + '.jpg'">
+        <div class="card w-25">
+            <img class="card-img" v-bind:src="'/images/' + item + '.jpg'">
+            <label class="mb-0">
+                <div class="card-img-overlay">
+                    <input name="main" type="radio" v-bind:value="item" @change="select_radio" v-bind:checked="set_checked(item, main_id)">
+                </div>
+            </label>
+        </div>
     `,
+    methods: {
+        select_radio: function (e) {
+            app.select_main_img = '<img class="d-block m-auto" src="/images/' + e.target.value + '.jpg">'
+            app.select_main_img_id = e.target.value
+        },
+        set_checked: function (item, main_id) {
+            if (main_id == item) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
 })
 
 Vue.component('list', {
@@ -13,37 +33,46 @@ Vue.component('list', {
     template: `
         <div class="card w-25">
             <img class="card-img" v-bind:src="'/images/' + item + '.jpg'" alt="">
-            <div class="card-img-overlay">
-                <input type="checkbox" v-bind:value="item" @change="select" v-model="checked">
-            </div>
+            <label class="mb-0">
+                <div class="card-img-overlay">
+                    <input type="checkbox" v-bind:value="item" @change="select_checkbox" v-model="checked" v-bind:disabled="set_disabled(item)">
+                </div>
+            </label>
         </div>
     `,
     data: function (data) {
-        if (app.select.includes(data.item)) {
-            return {
-                checked: true,
-            }
+        if (app.select_sub_img.includes(data.item)) {
+            checked = true
         } else {
-            return {
-                checked: false,
-            }
+            checked = false
+        }
+        return {
+            checked: checked
         }
     },
     methods: {
-        select: function (e) {
+        select_checkbox: function (e) {
             if (e.target.checked) {
-                app.select.push(parseInt(e.target.value))
+                app.select_sub_img.push(parseInt(e.target.value))
             } else {
-                var index = app.select.indexOf(parseInt(e.target.value))
-                if (index > -1) {
-                    app.select.splice(index, 1)
+                let del = []
+                let idx = app.select_sub_img.indexOf(parseInt(e.target.value))
+                if (idx >= 0) {
+                    app.select_sub_img.splice(idx, 1);
                 }
+            }
+        },
+        set_disabled: function (item) {
+            if (app.select_main_img_id == item) {
+                return true
+            } else {
+                return false
             }
         }
     }
 })
 
-Vue.component('modal-item', {
+Vue.component('modal-cont', {
     props: ['data'],
     template: `
         <div id="modal" @click="except_modal_close">
@@ -73,8 +102,13 @@ const app = new Vue({
     el: '#app',
     data: {
         show: false,
-        list: list_array,
-        select: select_array
+        img_list: image_array,
+        select_sub_img: select_sub_img,
+        select_main_img: null,
+        select_main_img_id: select_main_img_id,
+    },
+    created: function () {
+        this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg">'
     },
     methods: {
         click_show: function () {

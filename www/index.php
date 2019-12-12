@@ -10,24 +10,32 @@
 <body>
     <div id="app" class="row justify-content-center col-12">
         <div class="d-flex flex-wrap mt-3 mb-3 col-5">
+            <div class="col-12" v-html="select_main_img">{{ select_main_img }}</div>
             <img-list
-                v-for="(item, index) in select"
+                v-for="(item, index) in select_sub_img"
                 v-bind:item="item"
                 v-bind:index="index"
                 v-bind:key="item.id"
+                v-bind:main_id="select_main_img_id"
             ></img-list>
             <div class="mt-4 w-100 d-flex justify-content-center">
                 <span @click="click_show" class="btn btn-info">開く</span>
             </div>
         </div>
-        <modal-item
+        <modal-cont
             v-if="show"
-            v-bind:data="list"
-        ></modal-item>
+            v-bind:data="img_list"
+        ></modal-cont>
+
+        <div class="col-12">
+            <input type="text" name="thumbnail_id" v-bind:value="select_main_img_id">
+            <input type="text" name="sub_thumbnail_id" v-bind:value="select_sub_img">
+        </div>
     </div><!--//app-->
     <script>
-        var list_array = [1, 2, 3, 4, 5]
-        var select_array = [1, 2]
+        var image_array = [1, 2, 3, 4, 5]
+        var select_main_img_id = 2
+        var select_sub_img = [1, 2]
     </script>
     <script src="/js/app.js"></script>
 </body>
