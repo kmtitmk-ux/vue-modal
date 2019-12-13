@@ -13,23 +13,33 @@
     justify-content: center;
     align-items: center;
     z-index: 1;
+    .card-img-overlay {
+        input {
+            transform: scale(1.2);
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1;
+        }
+    }
     .wrap {
-        padding: 10px;
+        padding: 2.5%;
         position: relative;
-        background: #FFF;
-        width: 600px;
+        background: #fff;
+        width: 800px;
         max-width: 90%;
-        height: 300px;
+        height: 90%;
         border-radius: 8px;
         box-shadow: 0 0 10px #aaa;
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: flex-start;
     }
     .close {
         position: absolute;
         top: -0.5em;
         right: 0;
         font-size: 3em;
+        z-index: 2;
     }
 }

@@ -9,8 +9,11 @@
 </head>
 <body>
     <div id="app" class="row justify-content-center col-12">
+
         <div class="d-flex flex-wrap mt-3 mb-3 col-5">
             <div class="col-12" v-html="select_main_img">{{ select_main_img }}</div>
+            <!--//選択されたメイン画像-->
+
             <img-list
                 v-for="(item, index) in select_sub_img"
                 v-bind:item="item"
@@ -18,24 +21,43 @@
                 v-bind:key="item.id"
                 v-bind:main_id="select_main_img_id"
             ></img-list>
+            <!--//複数選択された画像-->
+
             <div class="mt-4 w-100 d-flex justify-content-center">
                 <span @click="click_show" class="btn btn-info">開く</span>
             </div>
         </div>
+
         <modal-cont
             v-if="show"
             v-bind:data="img_list"
+            v-bind:type="modal_type"
         ></modal-cont>
+        <!--//モーダル用のコンテンツ-->
 
-        <div class="col-12">
+        <form class="col-12" method="post">
             <input type="text" name="thumbnail_id" v-bind:value="select_main_img_id">
             <input type="text" name="sub_thumbnail_id" v-bind:value="select_sub_img">
-        </div>
+            <button>保存</button>
+        </form>
+        <!--//POSTするため-->
+
     </div><!--//app-->
+    
+    <?php
+        $type = '[true, false]';
+        $select_sub_img = '[1, 2]';
+        if ($_GET['id'] == 1) {
+            $type = '[false, true]';
+            $select_sub_img = '[]';
+        }
+    ?>
+    
     <script>
-        var image_array = [1, 2, 3, 4, 5]
-        var select_main_img_id = 2
-        var select_sub_img = [1, 2]
+        var image_array = [1, 2, 3, 4, 5];
+        var select_main_img_id = 2;
+        var select_sub_img = <?php print $select_sub_img; ?>;
+        var modal_type = <?php print $type; ?>;
     </script>
     <script src="/js/app.js"></script>
 </body>

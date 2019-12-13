@@ -1,11 +1,12 @@
 require('bootstrap-css-only')
 const Vue = require('vue')
 
+//選択された画像一覧
 Vue.component('img-list', {
     props: ['item', 'main_id'],
     template: `
         <div class="card w-25">
-            <img class="card-img" v-bind:src="'/images/' + item + '.jpg'">
+            <img class="card-img" v-bind:src="'/images/' + item + '.jpg'" alt="">
             <label class="mb-0">
                 <div class="card-img-overlay">
                     <input name="main" type="radio" v-bind:value="item" @change="select_radio" v-bind:checked="set_checked(item, main_id)">
@@ -28,16 +29,35 @@ Vue.component('img-list', {
     }
 })
 
-Vue.component('list', {
+//モーダルの画像の単一選択
+Vue.component('list-single', {
     props: ['item'],
     template: `
-        <div class="card w-25">
+        <div class="card position-relative col-2 p-0">
+            <img class="card-img" v-bind:src="'/images/' + item + '.jpg'" @click="select_main(item)" alt="">
+        </div>
+    `,
+    methods: {
+        select_main: function (item) {
+            app.select_main_img = '<img class="d-block m-auto" src="/images/' + item + '.jpg" alt="">'
+            app.select_main_img_id = item
+            app.select_sub_img = []
+        },
+    }
+})
+
+//モーダルの画像一覧複数選択
+Vue.component('list-any', {
+    props: ['item'],
+    template: `
+        <div class="card position-relative col-2 p-0">
             <img class="card-img" v-bind:src="'/images/' + item + '.jpg'" alt="">
             <label class="mb-0">
                 <div class="card-img-overlay">
                     <input type="checkbox" v-bind:value="item" @change="select_checkbox" v-model="checked" v-bind:disabled="set_disabled(item)">
                 </div>
             </label>
+            <input class="form-control" type="text" value="123" readonly>
         </div>
     `,
     data: function (data) {
@@ -72,22 +92,28 @@ Vue.component('list', {
     }
 })
 
+//モーダルで表示
 Vue.component('modal-cont', {
-    props: ['data'],
+    props: ['data', 'type'],
     template: `
         <div id="modal" @click="except_modal_close">
-            <div class="wrap">
+            <div class="wrap position-relative row justify-content-between">
                 <span class="close" @click="modal_close">&times;</span>
-                <list　v-for="(item, index) in data"
+                <list-any v-if="type[0]" v-for="(item, index) in data"
                     v-bind:item="item"
                     v-bind:index="index"
                     v-bind:key="item.id"
-                ></list>
+                ></list-any>
+                <list-single v-if="type[1]" v-for="(item, index) in data"
+                    v-bind:item="item"
+                    v-bind:index="index"
+                    v-bind:key="item.id"
+                ></list-single>
             </div>
         </div>
     `,
     methods: {
-        modal_close: function () {
+        modal_close: function (type) {
             app.$data.show = false;
         },
         except_modal_close: function (e) {
@@ -106,9 +132,10 @@ const app = new Vue({
         select_sub_img: select_sub_img,
         select_main_img: null,
         select_main_img_id: select_main_img_id,
+        modal_type: modal_type
     },
     created: function () {
-        this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg">'
+        this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg" alt="">'
     },
     methods: {
         click_show: function () {

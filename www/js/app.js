@@ -13215,11 +13215,12 @@ module.exports = g;
 
 __webpack_require__(/*! bootstrap-css-only */ "./node_modules/bootstrap-css-only/css/bootstrap.min.css");
 
-var Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+var Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js"); //選択された画像一覧
+
 
 Vue.component('img-list', {
   props: ['item', 'main_id'],
-  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input name=\"main\" type=\"radio\" v-bind:value=\"item\" @change=\"select_radio\" v-bind:checked=\"set_checked(item, main_id)\">\n                </div>\n            </label>\n        </div>\n    ",
+  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input name=\"main\" type=\"radio\" v-bind:value=\"item\" @change=\"select_radio\" v-bind:checked=\"set_checked(item, main_id)\">\n                </div>\n            </label>\n        </div>\n    ",
   methods: {
     select_radio: function select_radio(e) {
       app.select_main_img = '<img class="d-block m-auto" src="/images/' + e.target.value + '.jpg">';
@@ -13233,10 +13234,23 @@ Vue.component('img-list', {
       }
     }
   }
-});
-Vue.component('list', {
+}); //モーダルの画像の単一選択
+
+Vue.component('list-single', {
   props: ['item'],
-  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"checkbox\" v-bind:value=\"item\" @change=\"select_checkbox\" v-model=\"checked\" v-bind:disabled=\"set_disabled(item)\">\n                </div>\n            </label>\n        </div>\n    ",
+  template: "\n        <div class=\"card position-relative col-2 p-0\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" @click=\"select_main(item)\" alt=\"\">\n        </div>\n    ",
+  methods: {
+    select_main: function select_main(item) {
+      app.select_main_img = '<img class="d-block m-auto" src="/images/' + item + '.jpg" alt="">';
+      app.select_main_img_id = item;
+      app.select_sub_img = [];
+    }
+  }
+}); //モーダルの画像一覧複数選択
+
+Vue.component('list-any', {
+  props: ['item'],
+  template: "\n        <div class=\"card position-relative col-2 p-0\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"checkbox\" v-bind:value=\"item\" @change=\"select_checkbox\" v-model=\"checked\" v-bind:disabled=\"set_disabled(item)\">\n                </div>\n            </label>\n            <input class=\"form-control\" type=\"text\" value=\"123\" readonly>\n        </div>\n    ",
   data: function data(_data) {
     if (app.select_sub_img.includes(_data.item)) {
       checked = true;
@@ -13269,12 +13283,13 @@ Vue.component('list', {
       }
     }
   }
-});
+}); //モーダルで表示
+
 Vue.component('modal-cont', {
-  props: ['data'],
-  template: "\n        <div id=\"modal\" @click=\"except_modal_close\">\n            <div class=\"wrap\">\n                <span class=\"close\" @click=\"modal_close\">&times;</span>\n                <list\u3000v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list>\n            </div>\n        </div>\n    ",
+  props: ['data', 'type'],
+  template: "\n        <div id=\"modal\" @click=\"except_modal_close\">\n            <div class=\"wrap position-relative row justify-content-between\">\n                <span class=\"close\" @click=\"modal_close\">&times;</span>\n                <list-any v-if=\"type[0]\" v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list-any>\n                <list-single v-if=\"type[1]\" v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list-single>\n            </div>\n        </div>\n    ",
   methods: {
-    modal_close: function modal_close() {
+    modal_close: function modal_close(type) {
       app.$data.show = false;
     },
     except_modal_close: function except_modal_close(e) {
@@ -13291,10 +13306,11 @@ var app = new Vue({
     img_list: image_array,
     select_sub_img: select_sub_img,
     select_main_img: null,
-    select_main_img_id: select_main_img_id
+    select_main_img_id: select_main_img_id,
+    modal_type: modal_type
   },
   created: function created() {
-    this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg">';
+    this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg" alt="">';
   },
   methods: {
     click_show: function click_show() {
