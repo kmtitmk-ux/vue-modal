@@ -13236,87 +13236,73 @@ module.exports = g;
 
 __webpack_require__(/*! bootstrap-css-only */ "./node_modules/bootstrap-css-only/css/bootstrap.min.css");
 
-var Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js"); //選択された画像一覧
+var Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js"); //チェックされた画像
 
 
-Vue.component('img-list', {
-  props: ['item', 'main_id'],
-  template: "\n        <div class=\"card w-25\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input name=\"main\" type=\"radio\" v-bind:value=\"item\" @change=\"select_radio\" v-bind:checked=\"set_checked(item, main_id)\">\n                </div>\n            </label>\n        </div>\n    ",
+Vue.component('modal-sub', {
+  props: ['item', 'select_main_id', 'select_sub_id'],
+  template: "\n        <div class=\"card w-25\">\n            <label class=\"mb-0\">\n                <img class=\"w-100\" v-bind:src=\"set_img_src(item)\" alt=\"\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"radio\" name=\"thumbnail_id\"\n                        v-bind:value=\"item\"\n                        v-bind:checked=\"set_checked(item, select_main_id, select_sub_id)\"\n                    @change=\"change_radio($event)\">\n                </div>\n            </label>\n        </div>\n    ",
   methods: {
-    select_radio: function select_radio(e) {
-      app.select_main_img = '<img class="d-block m-auto" src="/images/' + e.target.value + '.jpg">';
-      app.select_main_img_id = e.target.value;
+    change_radio: function change_radio(e) {
+      app.select_main_id = e.target.value;
+      app.main_img = '<img class="d-block m-auto" src="/images/' + e.target.value + '.jpg" alt="">';
     },
-    set_checked: function set_checked(item, main_id) {
-      if (main_id == item) {
+    set_img_src: function set_img_src(item) {
+      return '/images/' + item + '.jpg';
+    },
+    set_checked: function set_checked(item, select_main_id, select_sub_id) {
+      if (select_sub_id.length == 1) {
         return true;
       } else {
-        return false;
+        if (select_main_id == item) {
+          return true;
+        }
       }
     }
   }
-}); //モーダルの画像の単一選択
+}); //画像一覧
 
-Vue.component('list-single', {
-  props: ['item'],
-  template: "\n        <div class=\"card position-relative col-2 p-0\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" @click=\"select_main(item)\" alt=\"\">\n        </div>\n    ",
+Vue.component('img-list', {
+  props: ['item', 'select_main_id', 'select_sub_id'],
+  template: "\n        <div class=\"card w-25\">\n            <label class=\"mb-0\">\n                <img class=\"w-100\" v-bind:src=\"set_img_src(item)\" alt=\"\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"checkbox\" name=\"sub_ud_thumbnail[]\"\n                        v-bind:value=\"item\"\n                        v-bind:checked=\"set_checked(item, select_sub_id)\"\n                        v-bind:disabled=\"set_disabled(item, select_main_id)\"\n                    @change=\"change_check($event)\">\n                </div>\n            </label>\n        </div>\n    ",
   methods: {
-    select_main: function select_main(item) {
-      app.select_main_img = '<img class="d-block m-auto" src="/images/' + item + '.jpg" alt="">';
-      app.select_main_img_id = item;
-      app.select_sub_img = [];
-    }
-  }
-}); //モーダルの画像一覧複数選択
-
-Vue.component('list-any', {
-  props: ['item'],
-  template: "\n        <div class=\"card position-relative col-2 p-0\">\n            <img class=\"card-img\" v-bind:src=\"'/images/' + item + '.jpg'\" alt=\"\">\n            <label class=\"mb-0\">\n                <div class=\"card-img-overlay\">\n                    <input type=\"checkbox\" v-bind:value=\"item\" @change=\"select_checkbox\" v-model=\"checked\" v-bind:disabled=\"set_disabled(item)\">\n                </div>\n            </label>\n            <input class=\"form-control\" type=\"text\" value=\"123\" readonly>\n        </div>\n    ",
-  data: function data(_data) {
-    if (app.select_sub_img.includes(_data.item)) {
-      checked = true;
-    } else {
-      checked = false;
-    }
-
-    return {
-      checked: checked
-    };
-  },
-  methods: {
-    select_checkbox: function select_checkbox(e) {
+    change_check: function change_check(e) {
       if (e.target.checked) {
-        app.select_sub_img.push(parseInt(e.target.value));
+        app.select_sub_id.push(parseInt(e.target.value));
       } else {
-        var del = [];
-        var idx = app.select_sub_img.indexOf(parseInt(e.target.value));
+        var idx = app.select_sub_id.indexOf(parseInt(e.target.value));
 
         if (idx >= 0) {
-          app.select_sub_img.splice(idx, 1);
+          app.select_sub_id.splice(idx, 1);
         }
       }
     },
-    set_disabled: function set_disabled(item) {
-      if (app.select_main_img_id == item) {
+    set_disabled: function set_disabled(item, select_main_id) {
+      if (item == select_main_id) {
         return true;
       } else {
         return false;
       }
+    },
+    set_checked: function set_checked(item, select_sub_id) {
+      if (select_sub_id.includes(item)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    set_img_src: function set_img_src(item) {
+      return '/images/' + item + '.jpg';
     }
   }
 }); //モーダルで表示
 
 Vue.component('modal-cont', {
-  props: ['data', 'type'],
-  template: "\n        <div id=\"modal\" @click=\"except_modal_close\">\n            <div class=\"wrap position-relative row justify-content-between\">\n                <span class=\"close\" @click=\"modal_close\">&times;</span>\n                <list-any v-if=\"type[0]\" v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list-any>\n                <list-single v-if=\"type[1]\" v-for=\"(item, index) in data\"\n                    v-bind:item=\"item\"\n                    v-bind:index=\"index\"\n                    v-bind:key=\"item.id\"\n                ></list-single>\n            </div>\n        </div>\n    ",
+  props: ['data', 'select_sub_id', 'select_main_id'],
+  template: "\n        <div id=\"modal\">\n            <div class=\"wrap\">\n                <span @click=\"modal_close\" class=\"close\">close</span>\n                <img-list v-for=\"item in data\"\n                    v-bind:key=\"item.id\"\n                    v-bind:item=\"item\"\n                    v-bind:select_sub_id=\"select_sub_id\"\n                    v-bind:select_main_id=\"select_main_id\"\n                ></img-list>\n            </div>\n        </div>\n    ",
   methods: {
-    modal_close: function modal_close(type) {
-      app.$data.show = false;
-    },
-    except_modal_close: function except_modal_close(e) {
-      if (this.$el == e.target) {
-        app.$data.show = false;
-      }
+    modal_close: function modal_close(e) {
+      app.show = false;
     }
   }
 });
@@ -13324,14 +13310,15 @@ var app = new Vue({
   el: '#app',
   data: {
     show: false,
-    img_list: image_array,
-    select_sub_img: select_sub_img,
-    select_main_img: null,
-    select_main_img_id: select_main_img_id,
-    modal_type: modal_type
+    img_list: [1, 2, 4, 3],
+    select_sub_id: [2, 3],
+    select_main_id: 2,
+    main_img: null
   },
   created: function created() {
-    this.select_main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_img_id + '.jpg" alt="">';
+    if (this.select_main_id) {
+      this.main_img = '<img class="d-block m-auto" src="/images/' + this.select_main_id + '.jpg" alt="">';
+    }
   },
   methods: {
     click_show: function click_show() {
